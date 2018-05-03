@@ -123,6 +123,7 @@ int main(void){
 	
 	GPIO_PORTF_DATA_R = 0x08;						//Initialize led to green
   while(1){
+		STEPPER = fsm[s].Out; // step motor
     WaitForInterrupt();          
   }
 }
@@ -162,7 +163,6 @@ void SysTick_Handler(void){
 	if(mode){//if mode is high go clockwise
 		if (step_count<1000){
 			 s = fsm[s].Next[clockwise]; // clock wise circular
-			 STEPPER = fsm[s].Out; // step motor
 			 step_count += 1;
 		}
 		else{ //Hit max range and set to blue
@@ -174,7 +174,6 @@ void SysTick_Handler(void){
 	else{  //Else go counter-clockewise
 		if (step_count>0){
 			 s = fsm[s].Next[counterclockwise]; // clock wise circular
-			 STEPPER = fsm[s].Out; // step motor
 			 step_count -= 1;
 		}
 		else{ //Hit max range and set to green
@@ -184,12 +183,6 @@ void SysTick_Handler(void){
 		}
 	}
 }
-/*	
-	 s = fsm[s].Next[clockwise]; // clock wise circular
-  STEPPER = fsm[s].Out; // step motor
-
-*/
-
 //Doorbell (Sw1) interrupt
 void GPIOPortF_Handler(void){
 	GPIO_PORTF_ICR_R = 0x10;
@@ -198,9 +191,9 @@ void GPIOPortF_Handler(void){
 }
 //Ultrasonic sensor interrupt
 void GPIOPortB_Handler(void){
-	GPIO_PORTB_ICR_R = 0x01;
+	GPIO_PORTB_ICR_R = 0x02;
 	Count = 0;
-	(GPIO_PORTB_DATA_R&0x01) ? (mode = 0) : (mode = 1);
+	(GPIO_PORTB_DATA_R&0x02) ? (mode = 0) : (mode = 1);
 }
 
 void SysTick_Init(unsigned long period){
@@ -237,17 +230,17 @@ void PortB_Init(void){
 	volatile unsigned long delay;
   SYSCTL_RCGC2_R |= 0x00000002;     // 1) B clock
   delay = SYSCTL_RCGC2_R;           // delay   
-  GPIO_PORTB_CR_R |= 0x01;           // allow changes to PB0       
-  GPIO_PORTB_DIR_R &=  ~0x01;    //  make PB0 input
-  GPIO_PORTB_AFSEL_R &= ~0x01;  //     disable alt funct on PB0
-  GPIO_PORTB_DEN_R |= 0x01;     //     enable digital I/O on PB0 
+  GPIO_PORTB_CR_R |= 0x02;           // allow changes to PB0       
+  GPIO_PORTB_DIR_R &=  ~0x02;    //  make PB0 input
+  GPIO_PORTB_AFSEL_R &= ~0x02;  //     disable alt funct on PB0
+  GPIO_PORTB_DEN_R |= 0x02;     //     enable digital I/O on PB0 
   GPIO_PORTB_PCTL_R &= ~0x000000F; // configure PB0 as GPIO
   GPIO_PORTB_AMSEL_R = 0;       //     disable analog functionality on PB
-  GPIO_PORTB_PUR_R |= 0x01;     //     enable weak pull-up on PB0
-	GPIO_PORTB_IS_R &= ~0x01;     // (d) PB0 is edge-sensitive
-  GPIO_PORTB_IBE_R |= 0x01;    //     PB0 is both edges
-  GPIO_PORTB_ICR_R = 0x01;      // (e) clear PB0
-  GPIO_PORTB_IM_R |= 0x01;      // (f) arm interrupt on PB0
+  GPIO_PORTB_PUR_R |= 0x02;     //     enable weak pull-up on PB0
+	GPIO_PORTB_IS_R &= ~0x02;     // (d) PB0 is edge-sensitive
+  GPIO_PORTB_IBE_R |= 0x02;    //     PB0 is both edges
+  GPIO_PORTB_ICR_R = 0x02;      // (e) clear PB0
+  GPIO_PORTB_IM_R |= 0x02;      // (f) arm interrupt on PB0
   NVIC_PRI0_R |= (NVIC_PRI0_R&0xFFFF00FFF)|0x00000000; // priority 0
   NVIC_EN0_R |= 0x00000002;      // (h) enable interrupt 1 in NVIC
 }
