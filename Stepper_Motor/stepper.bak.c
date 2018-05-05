@@ -32,41 +32,41 @@
 
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
+#include "systick.h"
 struct State{
-  uint8_t Out;     // Output
-  uint8_t Next[2]; // CW/CCW
+  uint8_t Out;           // Output
+  const struct State *Next[2]; // CW/CCW
 };
 typedef const struct State StateType;
-
+typedef StateType *StatePtr;
 #define clockwise 0        // Next index
 #define counterclockwise 1 // Next index
 StateType fsm[4]={
-  {12,{1,3}},
-  { 6,{2,0}},
-  { 3,{3,1}},
-  { 1,{0,2}}
+  {12,{&fsm[1],&fsm[3]}},
+  { 6,{&fsm[2],&fsm[0]}},
+  { 3,{&fsm[3],&fsm[1]}},
+  { 1,{&fsm[0],&fsm[2]}}
 };
-unsigned char s; // current state
+const struct State *Pt;// Current State
 
 #define STEPPER  (*((volatile uint32_t *)0x4000703C))
-	
 // Move 1.8 degrees clockwise, delay is the time to wait after each step
-void Stepper_CW(unsigned long delay){
-  s = fsm[s].Next[clockwise]; // clock wise circular
-  STEPPER = fsm[s].Out; // step motor
+void Stepper_CW(uint32_t delay){
+  Pt = Pt->Next[clockwise];     // circular
+  STEPPER = Pt->Out; // step motor
   SysTick_Wait(delay);
 }
 // Move 1.8 degrees counterclockwise, delay is wait after each step
-void Stepper_CCW(unsigned long delay){
-  s = fsm[s].Next[counterclockwise]; // counter clock wise circular
-  STEPPER = fsm[s].Out; // step motor
+void Stepper_CCW(uint32_t delay){
+  Pt = Pt->Next[counterclockwise]; // circular
+  STEPPER = Pt->Out; // step motor
   SysTick_Wait(delay); // blind-cycle wait
 }
 // Initialize Stepper interface
 void Stepper_Init(void){
   SYSCTL_RCGCGPIO_R |= 0x08; // 1) activate port D
   SysTick_Init();
-  s = 0; 
+  Pt = &fsm[0]; 
                                     // 2) no need to unlock PD3-0
   GPIO_PORTD_AMSEL_R &= ~0x0F;      // 3) disable analog functionality on PD3-0
   GPIO_PORTD_PCTL_R &= ~0x0000FFFF; // 4) GPIO configure PD3-0 as GPIO
