@@ -25,7 +25,6 @@
 ///////////////////////////////////////
 //  Register definitions
 ///////////////////////////////////////
-//Port f
 #include "TExaS.h"
 
 #define NVIC_EN0_R              (*((volatile unsigned long *)0xE000E100))  // IRQ 0 to 31 Set Enable Register
@@ -81,13 +80,10 @@
 #define GPIO_PORTD_DEN_R        (*((volatile unsigned long *)0x4000751C))
 #define SYSCTL_RCGCGPIO_R       (*((volatile unsigned long *)0x400FE608))
 
+//Global Variables
 #define STEPPER  (*((volatile unsigned long *)0x4000703C))
 #define clockwise 0        // Next index
 #define counterclockwise 1 // Next index
-
-
-//   Global Variables
-
 unsigned long In;  // input from PF4
 unsigned long Out; // outputs to PF3,PF2,PF1 (multicolor LED)
 unsigned int Count; 
@@ -95,28 +91,19 @@ unsigned int mode;
 unsigned char s; // current state
 unsigned long step_count;
 
+//Function declaration
 void PortB_Init(void);
 void PortF_Init(void);
-void Delay(void);
 void EnableInterrupts(void);
 void WaitForInterrupt(void);  
 void Stepper_Init(void);
-
-void SysTick_Init(unsigned long period)
-{
-  NVIC_ST_CTRL_R = 0;         // disable SysTick during setup
-  NVIC_ST_RELOAD_R = period-1;// reload value
-  NVIC_ST_CURRENT_R = 0;      // any write to current clears it
-  NVIC_SYS_PRI3_R = (NVIC_SYS_PRI3_R&0x00FFFFFF)|0x40000000; // priority 2
-  NVIC_ST_CTRL_R = 0x07;
-}
+void SysTick_Init(unsigned long period);
 
 struct State{
   unsigned long Out;     // Output
   unsigned long Next[2]; // CW/CCW
 };
 typedef const struct State StateType;
-
 StateType fsm[4]={
   {12,{1,3}},
   { 6,{2,0}},
@@ -124,27 +111,27 @@ StateType fsm[4]={
   { 1,{0,2}}
 };
 
-int main(void)
-{  
-	Count = 0;														// counts for flash
-	mode = 0;															// modes 1 & 2
-	PortB_Init();                          // Call initialization of port PB0
-  PortF_Init();                          // Call initialization of port PF4 PF2 
+int main(void){  
+	//Initialize ports and variables
+	Count = 0;  //Flash counter
+	mode = 0;	  //Mode selector
+	PortB_Init();        
+  PortF_Init();         
 	Stepper_Init();
 	SysTick_Init(160000);                 // initialize SysTick timer	
-  EnableInterrupts();                    // The grader uses interrupts                            // Set the mode to 1 so green LED is on
+  EnableInterrupts();                    // The grader uses interrupts
 	
-	GPIO_PORTF_DATA_R = 0x08;						//set color to green at start
-  while(1)
-	{
+	GPIO_PORTF_DATA_R = 0x08;						//Initialize led to green
+  while(1){
+		STEPPER = fsm[s].Out; // step motor
     WaitForInterrupt();          
   }
 }
 
 // Initialize Stepper interface
 void Stepper_Init(void){
+	s = 0;                      // 2) no need to unlock PD3-0
   SYSCTL_RCGCGPIO_R |= 0x08; // 1) activate port D
-  s = 0;                                   // 2) no need to unlock PD3-0
   GPIO_PORTD_AMSEL_R &= ~0x0F;      // 3) disable analog functionality on PD3-0
   GPIO_PORTD_PCTL_R &= ~0x0000FFFF; // 4) GPIO configure PD3-0 as GPIO
   GPIO_PORTD_DIR_R |= 0x0F;   // 5) make PD3-0 out
@@ -153,105 +140,72 @@ void Stepper_Init(void){
   GPIO_PORTD_DEN_R |= 0x0F;   // 7) enable digital I/O on PD3-0 
 }
 
-
 //systic handler for counting
-void SysTick_Handler(void)
+void SysTick_Handler(void){
+// Color    LED(s) PortF
+// dark     ---    0
+// red      R--    0x02
+// blue     --B    0x04
+// green    -G-    0x08
+// yellow   RG-    0x0A
+// sky blue -GB    0x0C	
+// white    RGB    0x0E
+// pink     R-B    0x06
 	
-{
-	//if mode is 2 go clockwise
-	if(mode == 2)
-	{
-		
-		Count += 1;// count for flash
-		
-		if (Count>50) // half a sec 
-		{
-			GPIO_PORTF_DATA_R ^= 0x02;
-			GPIO_PORTF_DATA_R &= ~0x0D;  //clear bits
-			
-			Count = 0;
-		}
-		// if count less than 1000, count up
-		if (step_count<1000)
-		{
+	//Flash red led	
+	Count += 1;// count for flash
+	if (Count>50){ // half a sec 
+		GPIO_PORTF_DATA_R ^= 0x02; //Flash red
+		GPIO_PORTF_DATA_R &= ~0x0D;  //clear bits //FIXME: How did you knwo 0d?
+		Count = 0;
+	}
+	
+	if(mode){//if mode is high go clockwise
+		if (step_count<1000){
 			 s = fsm[s].Next[clockwise]; // clock wise circular
-			 STEPPER = fsm[s].Out; // step motor
 			 step_count += 1;
 		}
-		//if = 1000, stop
-		else if(step_count >= 1000)
-		{
-			Count = 0;
+		else{ //Hit max range and set to blue
+			//Count = 0;  //FIXME: does this do anything?
 			GPIO_PORTF_DATA_R = 0x04;
 			GPIO_PORTF_DATA_R &= ~0x0B;
 		}
 	}
-
-	else if (mode == 1)
-	{
-		Count += 1;
-		if (Count>50) // half a sec 
-		{
-			GPIO_PORTF_DATA_R ^= 0x02;
-			GPIO_PORTF_DATA_R &= ~0x0D;	//clear for flashing
-			// reset count to 0
-			Count = 0;
-		}
-		if (step_count>0)
-		{
+	else{  //Else go counter-clockewise
+		if (step_count>0){
 			 s = fsm[s].Next[counterclockwise]; // clock wise circular
-			 STEPPER = fsm[s].Out; // step motor
 			 step_count -= 1;
 		}
-		else if(step_count == 0)
-		{
-			Count = 0;
+		else{ //Hit max range and set to green
+			//Count = 0; //FIXME: does this do anything?
 			GPIO_PORTF_DATA_R = 0x08;
 			GPIO_PORTF_DATA_R &= ~0x07;//clear bits for color
 		}
 	}
-/*	
-	 s = fsm[s].Next[clockwise]; // clock wise circular
-  STEPPER = fsm[s].Out; // step motor
-
-*/
 }
-
-
-
-//portF handler
-//buttons switch depedning on mode,ex: if mode 1, hit button, goes to mode 2
-void GPIOPortF_Handler(void)
-{
-		GPIO_PORTF_ICR_R = 0x10;
-	if (mode == 1)
-	{
-		mode = 2;
-	}
-	else
-	{
-		mode = 1;
-	}
-	
+//Doorbell (Sw1) interrupt
+void GPIOPortF_Handler(void){
+	GPIO_PORTF_ICR_R = 0x10;
+	//Why doesn't this set count to 0
+	(mode) ? (mode = 0) : (mode = 1);	
 }
-
-//portB handler
-void GPIOPortB_Handler(void)
-{
-	GPIO_PORTB_ICR_R = 0x01;
+//Ultrasonic sensor interrupt
+void GPIOPortB_Handler(void){
+	GPIO_PORTB_ICR_R = 0x02;
 	Count = 0;
-	if((GPIO_PORTB_DATA_R&0x01) == 1)
-	{
-		mode = 1;
-	}
-	else 
-	{
-		mode = 2;
-	}
+	(GPIO_PORTB_DATA_R&0x02) ? (mode = 0) : (mode = 1);
 }
 
+void SysTick_Init(unsigned long period){
+  NVIC_ST_CTRL_R = 0;         // disable SysTick during setup
+  NVIC_ST_RELOAD_R = period-1;// reload value
+  NVIC_ST_CURRENT_R = 0;      // any write to current clears it
+  NVIC_SYS_PRI3_R = (NVIC_SYS_PRI3_R&0x00FFFFFF)|0x40000000; // priority 2
+  NVIC_ST_CTRL_R = 0x07;
+}
 
-void PortF_Init(void){ volatile unsigned long delay;
+void PortF_Init(void){
+	volatile unsigned long delay;
   SYSCTL_RCGC2_R |= 0x00000020;     // 1) F clock
   delay = SYSCTL_RCGC2_R;           // delay   
   GPIO_PORTF_LOCK_R = 0x4C4F434B;   // 2) unlock PortF PF0  
@@ -270,28 +224,23 @@ void PortF_Init(void){ volatile unsigned long delay;
   GPIO_PORTF_IM_R |= 0x10;      // (f) arm interrupt on PF4
   NVIC_PRI7_R |= (NVIC_PRI7_R&0xFF00FFFF)|0x00A00000; // (g) priority 5
   NVIC_EN0_R |= 0x40000000;      // (h) enable interrupt 30 in NVIC
-
 }
 
-
-void PortB_Init(void){ volatile unsigned long delay;
+void PortB_Init(void){
+	volatile unsigned long delay;
   SYSCTL_RCGC2_R |= 0x00000002;     // 1) B clock
   delay = SYSCTL_RCGC2_R;           // delay   
-  GPIO_PORTB_CR_R |= 0x01;           // allow changes to PB0       
-  GPIO_PORTB_DIR_R &=  ~0x01;    //  make PB0 input
-  GPIO_PORTB_AFSEL_R &= ~0x01;  //     disable alt funct on PB0
-  GPIO_PORTB_DEN_R |= 0x01;     //     enable digital I/O on PB0 
+  GPIO_PORTB_CR_R |= 0x02;           // allow changes to PB0       
+  GPIO_PORTB_DIR_R &=  ~0x02;    //  make PB0 input
+  GPIO_PORTB_AFSEL_R &= ~0x02;  //     disable alt funct on PB0
+  GPIO_PORTB_DEN_R |= 0x02;     //     enable digital I/O on PB0 
   GPIO_PORTB_PCTL_R &= ~0x000000F; // configure PB0 as GPIO
   GPIO_PORTB_AMSEL_R = 0;       //     disable analog functionality on PB
-  GPIO_PORTB_PUR_R |= 0x01;     //     enable weak pull-up on PB0
-	GPIO_PORTB_IS_R &= ~0x01;     // (d) PB0 is edge-sensitive
-  GPIO_PORTB_IBE_R |= 0x01;    //     PB0 is both edges
- // GPIO_PORTB_IEV_R &= ~0x01;    //     PB0 falling edge event
-  GPIO_PORTB_ICR_R = 0x01;      // (e) clear PB0
-  GPIO_PORTB_IM_R |= 0x01;      // (f) arm interrupt on PB0
+  GPIO_PORTB_PUR_R |= 0x02;     //     enable weak pull-up on PB0
+	GPIO_PORTB_IS_R &= ~0x02;     // (d) PB0 is edge-sensitive
+  GPIO_PORTB_IBE_R |= 0x02;    //     PB0 is both edges
+  GPIO_PORTB_ICR_R = 0x02;      // (e) clear PB0
+  GPIO_PORTB_IM_R |= 0x02;      // (f) arm interrupt on PB0
   NVIC_PRI0_R |= (NVIC_PRI0_R&0xFFFF00FFF)|0x00000000; // priority 0
   NVIC_EN0_R |= 0x00000002;      // (h) enable interrupt 1 in NVIC
 }
-
-
-
