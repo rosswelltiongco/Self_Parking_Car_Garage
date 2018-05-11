@@ -35,7 +35,6 @@ void WaitForInterrupt(void);
 
 
 int main(void){
-	//unsigned int i=0;
 	isObstacle = 0;
 	enterFlag= 0;
 	exitFlag = 0;
@@ -43,27 +42,36 @@ int main(void){
 	PortB_Init();           
   PortF_Init();  
   Stepper_Init();
-	EnableInterrupts();                    // The grader uses interrupts
-
+	EnableInterrupts();
+	setSpeed(1); //Initialize speed
   while(1){
-		if (isObstacle){
-			moveForward();
-		}
-		else if (enterFlag){
-			moveForward();
-			enterFlag = 0;
+		//240 for 90 degree turns
+		if (enterFlag){
+			moveForward(180); //Requirement: 1
+			turnLeft(240);  //Requirement: 2
+			
+			while (!isObstacle){ //Requirement: 3
+				moveForward(1); //Note: In while loop cannot be 1: will not register/jittery movement
+			}
+			while (isObstacle){
+				//Do nothing until there is no obstacle
+				setSpeed(20);
+				moveForward(1);
+				moveBackward(1);
+			}
+			setSpeed(1);
+			moveForward(360); //Requirement: 4
+			enterFlag = 0; //Handle flag, prevent infinite loop
 		}
 		else if (exitFlag){
-			moveForward();
-			exitFlag = 0;
+			moveBackward(180); //Requirement: 5
+			turnRight(240); //Requirement: 6
+			moveForward(180); //Requirement: 7
+			exitFlag = 0; //Handle flag, prevent infinite loop
 		}
-		//enterFlag
-		//exitFlag
-		//moveBackward();
-		//turnLeft();
-		//turnRight();
-		
+	
   }
+	
 }
 
 //Doorbell (Sw1) interrupt

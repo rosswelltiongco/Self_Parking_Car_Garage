@@ -29,8 +29,10 @@ StateType motorRight[4]={
   { 1,{0,2}}
 };
 unsigned int i;
+unsigned int speed = 10; //Default: 10/ Inversely proportional speed
 unsigned char leftState; // current state
 unsigned char rightState; // current state
+
 
 #define STEPPERLEFT   (*((volatile unsigned long *)0x4000703C))
 #define STEPPERRIGHT  (*((volatile unsigned long *)0x4002403C)) 
@@ -61,6 +63,17 @@ void StepperRight_CCW(unsigned long delay){
   SysTick_Wait(delay); // blind-cycle wait
 }
 
+void setSpeed(unsigned long delay){
+	speed = delay;
+}
+
+void motorsOff(void){
+	SYSCTL_RCGCGPIO_R &= ~0x08; // 1) deactivate port D
+}
+void motorsOn(void){
+	SYSCTL_RCGCGPIO_R |= 0x08; // 1) deactivate port D
+}
+
 // Initialize Stepper interface
 void Stepper_Init(void){
 	SysTick_Init();
@@ -87,31 +100,34 @@ void Stepper_Init(void){
   GPIO_PORTE_DEN_R |= 0x0F;   // 7) enable digital I/O on PE3-0 
 }
 
-void moveForward(void){
+void moveForward(unsigned int degrees){
 	//1000 = 180 degrees
-	for (i=0; i<100; i++){
-		StepperLeft_CW(10*T1ms);   // output every 10ms
-		StepperRight_CCW(10*T1ms);   // output every 10ms
+	//5.6 = degree
+	//degrees * 5.6
+	for (i = 0; i < degrees * 5.6; i++){
+		StepperLeft_CW(speed*T1ms);   // output every 10ms
+		StepperRight_CCW(speed*T1ms);   // output every 10ms
 	}
 }
 
-void moveBackward(void){
-	for (i=0; i<100; i++){
-			StepperLeft_CCW(10*T1ms);   // output every 10ms
-			StepperRight_CW(10*T1ms);   // output every 10ms
+void moveBackward(unsigned int degrees){
+	for (i = 0; i < degrees * 5.6; i++){
+			StepperLeft_CCW(speed*T1ms);   // output every 10ms
+			StepperRight_CW(speed*T1ms);   // output every 10ms
 	}
 }
 
-void turnLeft(void){
-	for (i=0; i<100; i++){
-			StepperLeft_CCW(10*T1ms);   // output every 10ms
-			StepperRight_CCW(10*T1ms);   // output every 10ms
+void turnLeft(unsigned int degrees){
+	for (i = 0; i < degrees * 5.6; i++){
+			StepperLeft_CCW(speed*T1ms);   // output every 10ms
+			StepperRight_CCW(speed*T1ms);   // output every 10ms
 	}
 }
 
-void turnRight(void){
-	for (i=0; i<100; i++){
-			StepperLeft_CW(10*T1ms);   // output every 10ms
-			StepperRight_CW(10*T1ms);   // output every 10ms
+void turnRight(unsigned int degrees){
+	for (i = 0; i < degrees * 5.6; i++){
+			StepperLeft_CW(speed*T1ms);   // output every 10ms
+			StepperRight_CW(speed*T1ms);   // output every 10ms
 	}
 }
+

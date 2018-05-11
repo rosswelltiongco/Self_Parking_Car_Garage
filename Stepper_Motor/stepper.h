@@ -32,6 +32,8 @@
 
 // Initialize Stepper interface
 void Stepper_Init(void);
+void motorsOff(void);
+void motorsOn(void);
 
 // Move 1.8 degrees clockwise, 
 // delay is the time to wait after each step in bus cycles
@@ -48,7 +50,8 @@ void StepperRight_CCW(unsigned long delay);
 // time is the number of bus cycles to wait after each step
 void Stepper_Seek(unsigned long desired, unsigned long time);
 
-void moveForward(void);
-void moveBackward(void);
-void turnLeft(void);
-void turnRight(void);
+void moveForward(unsigned int degrees);
+void moveBackward(unsigned int degrees);
+void turnLeft(unsigned int degrees);
+void turnRight(unsigned int degrees);
+void setSpeed(unsigned long delay);
