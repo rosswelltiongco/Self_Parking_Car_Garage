@@ -425,6 +425,11 @@
               <FileType>1</FileType>
               <FilePath>.\SysTick.c</FilePath>
             </File>
+            <File>
+              <FileName>stepper.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\stepper.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -847,6 +852,11 @@
               <FileName>SysTick.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\SysTick.c</FilePath>
+            </File>
+            <File>
+              <FileName>stepper.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\stepper.h</FilePath>
             </File>
           </Files>
         </Group>

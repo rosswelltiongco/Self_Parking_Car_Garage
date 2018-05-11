@@ -25,10 +25,7 @@ stdint? - defines aliases for uint
 #include "stepper.h"
 #include "tm4c123gh6pm.h"
 
-unsigned int enterFlag, exitFlag;
-unsigned int obstacleFlag;
-unsigned int mode;
-
+unsigned int enterFlag, exitFlag, isObstacle;
 
 void PortB_Init(void);
 void PortF_Init(void);
@@ -39,9 +36,9 @@ void WaitForInterrupt(void);
 
 int main(void){
 	//unsigned int i=0;
-	obstacleFlag = 0;
-	//unsigned char mode;
-	mode = 0;	  //Mode selector
+	isObstacle = 0;
+	enterFlag= 0;
+	exitFlag = 0;
 
 	PortB_Init();           
   PortF_Init();  
@@ -49,9 +46,19 @@ int main(void){
 	EnableInterrupts();                    // The grader uses interrupts
 
   while(1){
-		if (mode == 1){
+		if (isObstacle){
 			moveForward();
 		}
+		else if (enterFlag){
+			moveForward();
+			enterFlag = 0;
+		}
+		else if (exitFlag){
+			moveForward();
+			exitFlag = 0;
+		}
+		//enterFlag
+		//exitFlag
 		//moveBackward();
 		//turnLeft();
 		//turnRight();
@@ -61,18 +68,22 @@ int main(void){
 
 //Doorbell (Sw1) interrupt
 void GPIOPortF_Handler(void){
-	GPIO_PORTF_ICR_R = 0x11;
-	//Why doesn't this set count to 0
-	(GPIO_PORTF_DATA_R&0x10) ? (enterFlag = 1) : (enterFlag = 0); //If Sw2 pushed
-	(GPIO_PORTF_DATA_R&0x01) ? (exitFlag = 1) : (exitFlag = 0); //If Sw2 pushed
-	//(mode) ? (mode = 0) : (mode = 1);	
+  if(GPIO_PORTF_RIS_R&0x01){  // SW2 touch
+    GPIO_PORTF_ICR_R = 0x01;  // acknowledge flag0
+    enterFlag = 1;
+  }
+  if(GPIO_PORTF_RIS_R&0x10){  // SW1 touch
+    GPIO_PORTF_ICR_R = 0x10;  // acknowledge flag4
+    exitFlag = 1;
+	}
 }
 
 //Ultrasonic sensor interrupt
 void GPIOPortB_Handler(void){
+	//If within range, else not in range
 	GPIO_PORTB_ICR_R = 0x02;
 	//Count = 0;
-	(GPIO_PORTB_DATA_R&0x02) ? (mode = 0) : (mode = 1);
+	(GPIO_PORTB_DATA_R&0x02) ? (isObstacle = 0) : (isObstacle = 1);
 }
 
 void PortF_Init(void){
@@ -80,13 +91,13 @@ void PortF_Init(void){
   SYSCTL_RCGC2_R |= 0x00000020;     // 1) F clock
   delay = SYSCTL_RCGC2_R;           // delay   
   GPIO_PORTF_LOCK_R = 0x4C4F434B;   // 2) unlock PortF PF0  
-  GPIO_PORTF_CR_R |= 0x1E;           // allow changes to PF4-0       
+  GPIO_PORTF_CR_R |= 0x1F;           // allow changes to PF4-0       
 	GPIO_PORTF_DIR_R &= ~0x11;    // (c) make PF4(sw2), PF0(sw1) inputs (built-in button)
   GPIO_PORTF_DIR_R |=  0x0E;    //  make PF3,PF2,PF1 output+++
   GPIO_PORTF_AFSEL_R &= ~0x11;  //     disable alt funct on PF4
-  GPIO_PORTF_DEN_R |= 0x1E;     //     enable digital I/O on PF4 - PF0  
+  GPIO_PORTF_DEN_R |= 0x1F;     //     enable digital I/O on PF4 - PF0  
   GPIO_PORTF_PCTL_R &= ~0x000F0000; // configure PF4 as GPIO
-  GPIO_PORTF_AMSEL_R = 0;       //     disable analog functionality on PF
+  GPIO_PORTF_AMSEL_R &= ~0x11;       //     disable analog functionality on PF
   GPIO_PORTF_PUR_R |= 0x11;     //     enable weak pull-up on PF4
 	GPIO_PORTF_IS_R &= ~0x11;     // (d) PF4 is edge-sensitive
   GPIO_PORTF_IBE_R &= ~0x11;    //     PF4 is not both edges

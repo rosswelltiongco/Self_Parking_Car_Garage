@@ -14,14 +14,14 @@ Section Cross References
     startup.o(.text) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
     startup.o(.text) refers to startup.o(HEAP) for HeapMem
     startup.o(.text) refers to startup.o(STACK) for StackMem
-    steppertestmain.o(i.GPIOPortB_Handler) refers to steppertestmain.o(.data) for mode
+    steppertestmain.o(i.GPIOPortB_Handler) refers to steppertestmain.o(.data) for isObstacle
     steppertestmain.o(i.GPIOPortF_Handler) refers to steppertestmain.o(.data) for enterFlag
     steppertestmain.o(i.main) refers to steppertestmain.o(i.PortB_Init) for PortB_Init
     steppertestmain.o(i.main) refers to steppertestmain.o(i.PortF_Init) for PortF_Init
     steppertestmain.o(i.main) refers to stepper.o(i.Stepper_Init) for Stepper_Init
     steppertestmain.o(i.main) refers to startup.o(.text) for EnableInterrupts
     steppertestmain.o(i.main) refers to stepper.o(i.moveForward) for moveForward
-    steppertestmain.o(i.main) refers to steppertestmain.o(.data) for obstacleFlag
+    steppertestmain.o(i.main) refers to steppertestmain.o(.data) for isObstacle
     stepper.o(i.StepperLeft_CCW) refers to systick.o(i.SysTick_Wait) for SysTick_Wait
     stepper.o(i.StepperLeft_CCW) refers to stepper.o(.data) for leftState
     stepper.o(i.StepperLeft_CCW) refers to stepper.o(.constdata) for motorLeft
@@ -275,19 +275,19 @@ Image Symbol Table
     .text                                    0x000003c2   Section        0  indicate_semi.o(.text)
     i.GPIOPortB_Handler                      0x000003c4   Section        0  steppertestmain.o(i.GPIOPortB_Handler)
     i.GPIOPortF_Handler                      0x000003f0   Section        0  steppertestmain.o(i.GPIOPortF_Handler)
-    i.PortB_Init                             0x00000438   Section        0  steppertestmain.o(i.PortB_Init)
-    i.PortF_Init                             0x0000052c   Section        0  steppertestmain.o(i.PortF_Init)
-    i.StepperLeft_CW                         0x0000064c   Section        0  stepper.o(i.StepperLeft_CW)
-    i.StepperRight_CCW                       0x00000688   Section        0  stepper.o(i.StepperRight_CCW)
-    i.Stepper_Init                           0x000006c4   Section        0  stepper.o(i.Stepper_Init)
-    i.SysTick_Init                           0x000007b4   Section        0  systick.o(i.SysTick_Init)
-    i.SysTick_Wait                           0x000007cc   Section        0  systick.o(i.SysTick_Wait)
-    i.main                                   0x000007ec   Section        0  steppertestmain.o(i.main)
-    i.moveForward                            0x00000820   Section        0  stepper.o(i.moveForward)
-    .constdata                               0x00000854   Section       24  stepper.o(.constdata)
-    .data                                    0x20000000   Section       16  steppertestmain.o(.data)
-    .data                                    0x20000010   Section        6  stepper.o(.data)
-    .bss                                     0x20000018   Section       96  libspace.o(.bss)
+    i.PortB_Init                             0x0000042c   Section        0  steppertestmain.o(i.PortB_Init)
+    i.PortF_Init                             0x00000520   Section        0  steppertestmain.o(i.PortF_Init)
+    i.StepperLeft_CW                         0x00000644   Section        0  stepper.o(i.StepperLeft_CW)
+    i.StepperRight_CCW                       0x00000680   Section        0  stepper.o(i.StepperRight_CCW)
+    i.Stepper_Init                           0x000006bc   Section        0  stepper.o(i.Stepper_Init)
+    i.SysTick_Init                           0x000007ac   Section        0  systick.o(i.SysTick_Init)
+    i.SysTick_Wait                           0x000007c4   Section        0  systick.o(i.SysTick_Wait)
+    i.main                                   0x000007e4   Section        0  steppertestmain.o(i.main)
+    i.moveForward                            0x00000840   Section        0  stepper.o(i.moveForward)
+    .constdata                               0x00000874   Section       24  stepper.o(.constdata)
+    .data                                    0x20000000   Section       12  steppertestmain.o(.data)
+    .data                                    0x2000000c   Section        6  stepper.o(.data)
+    .bss                                     0x20000014   Section       96  libspace.o(.bss)
     HEAP                                     0x20000078   Section        0  startup.o(HEAP)
     STACK                                    0x20000078   Section     1024  startup.o(STACK)
     HeapMem                                  0x20000078   Data           0  startup.o(HEAP)
@@ -514,29 +514,28 @@ Image Symbol Table
     __use_no_semihosting_swi                 0x000003c1   Thumb Code     2  use_no_semi.o(.text)
     __semihosting_library_function           0x000003c3   Thumb Code     0  indicate_semi.o(.text)
     GPIOPortB_Handler                        0x000003c5   Thumb Code    32  steppertestmain.o(i.GPIOPortB_Handler)
-    GPIOPortF_Handler                        0x000003f1   Thumb Code    56  steppertestmain.o(i.GPIOPortF_Handler)
-    PortB_Init                               0x00000439   Thumb Code   192  steppertestmain.o(i.PortB_Init)
-    PortF_Init                               0x0000052d   Thumb Code   230  steppertestmain.o(i.PortF_Init)
-    StepperLeft_CW                           0x0000064d   Thumb Code    46  stepper.o(i.StepperLeft_CW)
-    StepperRight_CCW                         0x00000689   Thumb Code    46  stepper.o(i.StepperRight_CCW)
-    Stepper_Init                             0x000006c5   Thumb Code   212  stepper.o(i.Stepper_Init)
-    SysTick_Init                             0x000007b5   Thumb Code    24  systick.o(i.SysTick_Init)
-    SysTick_Wait                             0x000007cd   Thumb Code    32  systick.o(i.SysTick_Wait)
-    main                                     0x000007ed   Thumb Code    42  steppertestmain.o(i.main)
-    moveForward                              0x00000821   Thumb Code    48  stepper.o(i.moveForward)
-    motorLeft                                0x00000854   Data          12  stepper.o(.constdata)
-    motorRight                               0x00000860   Data          12  stepper.o(.constdata)
-    Region$$Table$$Base                      0x0000086c   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x0000088c   Number         0  anon$$obj.o(Region$$Table)
+    GPIOPortF_Handler                        0x000003f1   Thumb Code    48  steppertestmain.o(i.GPIOPortF_Handler)
+    PortB_Init                               0x0000042d   Thumb Code   192  steppertestmain.o(i.PortB_Init)
+    PortF_Init                               0x00000521   Thumb Code   236  steppertestmain.o(i.PortF_Init)
+    StepperLeft_CW                           0x00000645   Thumb Code    46  stepper.o(i.StepperLeft_CW)
+    StepperRight_CCW                         0x00000681   Thumb Code    46  stepper.o(i.StepperRight_CCW)
+    Stepper_Init                             0x000006bd   Thumb Code   212  stepper.o(i.Stepper_Init)
+    SysTick_Init                             0x000007ad   Thumb Code    24  systick.o(i.SysTick_Init)
+    SysTick_Wait                             0x000007c5   Thumb Code    32  systick.o(i.SysTick_Wait)
+    main                                     0x000007e5   Thumb Code    80  steppertestmain.o(i.main)
+    moveForward                              0x00000841   Thumb Code    42  stepper.o(i.moveForward)
+    motorLeft                                0x00000874   Data          12  stepper.o(.constdata)
+    motorRight                               0x00000880   Data          12  stepper.o(.constdata)
+    Region$$Table$$Base                      0x0000088c   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x000008ac   Number         0  anon$$obj.o(Region$$Table)
     enterFlag                                0x20000000   Data           4  steppertestmain.o(.data)
     exitFlag                                 0x20000004   Data           4  steppertestmain.o(.data)
-    obstacleFlag                             0x20000008   Data           4  steppertestmain.o(.data)
-    mode                                     0x2000000c   Data           4  steppertestmain.o(.data)
-    i                                        0x20000010   Data           4  stepper.o(.data)
-    leftState                                0x20000014   Data           1  stepper.o(.data)
-    rightState                               0x20000015   Data           1  stepper.o(.data)
-    __libspace_start                         0x20000018   Data          96  libspace.o(.bss)
-    __temporary_stack_top$libspace           0x20000078   Data           0  libspace.o(.bss)
+    isObstacle                               0x20000008   Data           4  steppertestmain.o(.data)
+    i                                        0x2000000c   Data           4  stepper.o(.data)
+    leftState                                0x20000010   Data           1  stepper.o(.data)
+    rightState                               0x20000011   Data           1  stepper.o(.data)
+    __libspace_start                         0x20000014   Data          96  libspace.o(.bss)
+    __temporary_stack_top$libspace           0x20000074   Data           0  libspace.o(.bss)
 
 
 
@@ -546,9 +545,9 @@ Memory Map of the image
 
   Image Entry point : 0x0000026d
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x000008a4, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x000008c0, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Base: 0x00000000, Size: 0x0000088c, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Base: 0x00000000, Size: 0x000008ac, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -608,33 +607,34 @@ Memory Map of the image
     0x000003c2   0x00000000   Code   RO          253    .text               c_w.l(indicate_semi.o)
     0x000003c2   0x00000002   PAD
     0x000003c4   0x0000002c   Code   RO           12    i.GPIOPortB_Handler  steppertestmain.o
-    0x000003f0   0x00000048   Code   RO           13    i.GPIOPortF_Handler  steppertestmain.o
-    0x00000438   0x000000f4   Code   RO           14    i.PortB_Init        steppertestmain.o
-    0x0000052c   0x00000120   Code   RO           15    i.PortF_Init        steppertestmain.o
-    0x0000064c   0x0000003c   Code   RO           59    i.StepperLeft_CW    stepper.o
-    0x00000688   0x0000003c   Code   RO           60    i.StepperRight_CCW  stepper.o
-    0x000006c4   0x000000f0   Code   RO           62    i.Stepper_Init      stepper.o
-    0x000007b4   0x00000018   Code   RO          125    i.SysTick_Init      systick.o
-    0x000007cc   0x00000020   Code   RO          126    i.SysTick_Wait      systick.o
-    0x000007ec   0x00000034   Code   RO           16    i.main              steppertestmain.o
-    0x00000820   0x00000034   Code   RO           64    i.moveForward       stepper.o
-    0x00000854   0x00000018   Data   RO           67    .constdata          stepper.o
-    0x0000086c   0x00000020   Data   RO          305    Region$$Table       anon$$obj.o
+    0x000003f0   0x0000003c   Code   RO           13    i.GPIOPortF_Handler  steppertestmain.o
+    0x0000042c   0x000000f4   Code   RO           14    i.PortB_Init        steppertestmain.o
+    0x00000520   0x00000124   Code   RO           15    i.PortF_Init        steppertestmain.o
+    0x00000644   0x0000003c   Code   RO           59    i.StepperLeft_CW    stepper.o
+    0x00000680   0x0000003c   Code   RO           60    i.StepperRight_CCW  stepper.o
+    0x000006bc   0x000000f0   Code   RO           62    i.Stepper_Init      stepper.o
+    0x000007ac   0x00000018   Code   RO          125    i.SysTick_Init      systick.o
+    0x000007c4   0x00000020   Code   RO          126    i.SysTick_Wait      systick.o
+    0x000007e4   0x0000005c   Code   RO           16    i.main              steppertestmain.o
+    0x00000840   0x00000034   Code   RO           64    i.moveForward       stepper.o
+    0x00000874   0x00000018   Data   RO           67    .constdata          stepper.o
+    0x0000088c   0x00000020   Data   RO          305    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Base: 0x20000000, Size: 0x00000018, Max: 0xffffffff, ABSOLUTE)
-
-    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
-
-    0x20000000   0x00000010   Data   RW           17    .data               steppertestmain.o
-    0x20000010   0x00000006   Data   RW           68    .data               stepper.o
-
-
-    Execution Region ER_ZI (Base: 0x20000018, Size: 0x00000460, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Base: 0x20000000, Size: 0x00000014, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000018   0x00000060   Zero   RW          182    .bss                c_w.l(libspace.o)
+    0x20000000   0x0000000c   Data   RW           17    .data               steppertestmain.o
+    0x2000000c   0x00000006   Data   RW           68    .data               stepper.o
+
+
+    Execution Region ER_ZI (Base: 0x20000014, Size: 0x00000464, Max: 0xffffffff, ABSOLUTE)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x20000014   0x00000060   Zero   RW          182    .bss                c_w.l(libspace.o)
+    0x20000074   0x00000004   PAD
     0x20000078   0x00000000   Zero   RW            2    HEAP                startup.o
     0x20000078   0x00000400   Zero   RW            1    STACK               startup.o
 
@@ -647,12 +647,12 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
        692        632          0          0       1024        932   startup.o
-       412         60         24          6          0       2703   stepper.o
-       700        148          0         16          0       6796   steppertestmain.o
+       412         66         24          6          0       2703   stepper.o
+       732        144          0         12          0       6797   steppertestmain.o
         56          0          0          0          0       1290   systick.o
 
     ----------------------------------------------------------------------
-      1860        840         56         24       1024      11721   Object Totals
+      1892        842         56         20       1024      11722   Object Totals
          0          0         32          0          0          0   (incl. Generated)
          0          0          0          2          0          0   (incl. Padding)
 
@@ -682,8 +682,8 @@ Image component sizes
          2          0          0          0          0         68   use_no_semi.o
 
     ----------------------------------------------------------------------
-       272         16          0          0         96        576   Library Totals
-         6          0          0          0          0          0   (incl. Padding)
+       272         16          0          0        100        576   Library Totals
+         6          0          0          0          4          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -692,7 +692,7 @@ Image component sizes
        266         16          0          0         96        576   c_w.l
 
     ----------------------------------------------------------------------
-       272         16          0          0         96        576   Library Totals
+       272         16          0          0        100        576   Library Totals
 
     ----------------------------------------------------------------------
 
@@ -701,15 +701,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      2132        856         56         24       1120      11517   Grand Totals
-      2132        856         56         24       1120      11517   ELF Image Totals
-      2132        856         56         24          0          0   ROM Totals
+      2164        858         56         20       1124      11518   Grand Totals
+      2164        858         56         20       1124      11518   ELF Image Totals
+      2164        858         56         20          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 2188 (   2.14kB)
+    Total RO  Size (Code + RO Data)                 2220 (   2.17kB)
     Total RW  Size (RW Data + ZI Data)              1144 (   1.12kB)
-    Total ROM Size (Code + RO Data + RW Data)       2212 (   2.16kB)
+    Total ROM Size (Code + RO Data + RW Data)       2240 (   2.19kB)
 
 ==============================================================================
 

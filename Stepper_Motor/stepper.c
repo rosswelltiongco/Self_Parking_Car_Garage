@@ -89,28 +89,28 @@ void Stepper_Init(void){
 
 void moveForward(void){
 	//1000 = 180 degrees
-	for (i=0; i<1000; i++){
-		StepperLeft_CW(2*T1ms);   // output every 10ms
-		StepperRight_CCW(2*T1ms);   // output every 10ms
+	for (i=0; i<100; i++){
+		StepperLeft_CW(10*T1ms);   // output every 10ms
+		StepperRight_CCW(10*T1ms);   // output every 10ms
 	}
 }
 
 void moveBackward(void){
-	for (i=0; i<1000; i++){
+	for (i=0; i<100; i++){
 			StepperLeft_CCW(10*T1ms);   // output every 10ms
 			StepperRight_CW(10*T1ms);   // output every 10ms
 	}
 }
 
 void turnLeft(void){
-	for (i=0; i<1000; i++){
+	for (i=0; i<100; i++){
 			StepperLeft_CCW(10*T1ms);   // output every 10ms
 			StepperRight_CCW(10*T1ms);   // output every 10ms
 	}
 }
 
 void turnRight(void){
-	for (i=0; i<1000; i++){
+	for (i=0; i<100; i++){
 			StepperLeft_CW(10*T1ms);   // output every 10ms
 			StepperRight_CW(10*T1ms);   // output every 10ms
 	}
