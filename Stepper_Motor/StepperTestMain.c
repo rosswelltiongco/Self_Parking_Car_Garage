@@ -47,7 +47,7 @@ int main(void){
   while(1){
 		//240 for 90 degree turns
 		if (enterFlag){
-			moveForward(180); //Requirement: 1
+			moveForward(720); //Requirement: 1
 			turnLeft(240);  //Requirement: 2
 			
 			while (!isObstacle){ //Requirement: 3
@@ -55,7 +55,7 @@ int main(void){
 			}
 			while (isObstacle){
 				//Do nothing until there is no obstacle
-				setSpeed(20);
+				setSpeed(50);
 				moveForward(1);
 				moveBackward(1);
 			}
@@ -64,9 +64,9 @@ int main(void){
 			enterFlag = 0; //Handle flag, prevent infinite loop
 		}
 		else if (exitFlag){
-			moveBackward(180); //Requirement: 5
+			moveBackward(360); //Requirement: 5
 			turnRight(240); //Requirement: 6
-			moveForward(180); //Requirement: 7
+			moveForward(720); //Requirement: 7
 			exitFlag = 0; //Handle flag, prevent infinite loop
 		}
 	
