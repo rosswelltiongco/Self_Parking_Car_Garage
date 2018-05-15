@@ -4,29 +4,34 @@
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
 C:\Users\Rosswell\Documents\Self_Parking_Car_Garage\Sensor_Obstacle_Avoidance\Lab2.uvproj
-Project File Date:  03/16/2018
+Project File Date:  05/11/2018
 
 <h2>Output:</h2>
 Rebuild target 'HelloLaunchPad'
 compiling main.c...
-main.c(81): warning:  #550-D: variable "delay" was set but never used
-        unsigned int delay;
-main.c(121): warning:  #1-D: last line of file ends without a newline
-  }
-main.c: 2 warnings, 0 errors
 assembling startup.s...
 linking...
-Program Size: Code=2536 RO-data=2064 RW-data=48 ZI-data=1752  
-".\HelloLaunchPad.axf" - 0 Error(s), 2 Warning(s).
+Program Size: Code=2736 RO-data=2064 RW-data=56 ZI-data=1752  
+".\HelloLaunchPad.axf" - 0 Error(s), 0 Warning(s).
 Load "C:\\Users\\Rosswell\\Documents\\Self_Parking_Car_Garage\\Sensor_Obstacle_Avoidance\\HelloLaunchPad.axf" 
 Connecting: Mode=JTAG, Speed=1000000Hz
 Erase Done.
 Programming Done.
 Verify OK.
-" - 3 Error(s), 1 Warning(s).
+</pre>
+</body>
+</html>
+isObstacle, enterFlag, exitFlag = 0;
+main.c(29): warning:  #177-D: variable "exitFlag" was declared but never referenced
+        int isObstacle, enterFlag, exitFlag = 0;
+main.c(136): error:  #29: expected an expression
+        for (int i = 0; i < 5; i++){
+main.c(141): warning:  #1-D: last line of file ends without a newline
+  }
+main.c: 4 warnings, 2 errors
+assembling startup.s...
+".\HelloLaunchPad.axf" - 2 Error(s), 4 Warning(s).
 Target not created
-\Users\\Rosswell\\Documents\\Self_Parking_Car_Garage\\Sensor_Obstacle_Avoidance\\HelloLaunchPad.axf" 
-Connecting: Mode=JTAG, Speed=1000000Hz
-Erase Done.
-Programming Done.
-Verify OK.
+mbling startup.s...
+".\HelloLaunchPad.axf" - 3 Error(s), 4 Warning(s).
+Target not created
