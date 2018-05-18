@@ -33,7 +33,7 @@
 // Initialize Stepper interface
 void Stepper_Init(void);
 void motorsOff(void);
-void motorsOn(void);
+void motorsOn(void);`
 
 // Move 1.8 degrees clockwise, 
 // delay is the time to wait after each step in bus cycles

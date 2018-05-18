@@ -111,6 +111,21 @@ StateType fsm[4]={
   { 1,{0,2}}
 };
 
+void delay(unsigned long int time)    // This function provides delay in terms of seconds
+{
+		//Roughly 1 second delay on 16MHz TM4C
+    unsigned char i,j,k,l;
+ 
+    for(i = 0; i < time; i++){
+        for(j=0; j<250; j++){
+					for(k=0; k< 250; k++){
+						for (l=0; l< 60; l++){
+						}
+					}
+				}
+		}
+}
+
 int main(void){  
 	//Initialize ports and variables
 	Count = 0;  //Flash counter
@@ -118,7 +133,7 @@ int main(void){
 	PortB_Init();        
   PortF_Init();         
 	Stepper_Init();
-	SysTick_Init(160000);                 // initialize SysTick timer	
+	SysTick_Init(40000);                 // initialize SysTick timer	
   EnableInterrupts();                    // The grader uses interrupts
 	
 	GPIO_PORTF_DATA_R = 0x08;						//Initialize led to green
@@ -161,9 +176,12 @@ void SysTick_Handler(void){
 	}
 	
 	if(mode){//if mode is high go clockwise
-		if (step_count<1000){
+		if (step_count< 6000){
 			 s = fsm[s].Next[clockwise]; // clock wise circular
 			 step_count += 1;
+		}
+		else if (step_count == 6000){
+			delay(10);
 		}
 		else{ //Hit max range and set to blue
 			//Count = 0;  //FIXME: does this do anything?

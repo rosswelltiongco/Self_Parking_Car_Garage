@@ -32,7 +32,20 @@ void PortF_Init(void);
 void EnableInterrupts(void);
 void WaitForInterrupt(void);
 
-
+void delay(unsigned long int time)    // This function provides delay in terms of seconds
+{
+		//Roughly 1 second delay on 16MHz TM4C
+    unsigned char i,j,k,l;
+ 
+    for(i = 0; i < time; i++){
+        for(j=0; j<250; j++){
+					for(k=0; k< 250; k++){
+						for (l=0; l< 60; l++){
+						}
+					}
+				}
+		}
+}
 
 int main(void){
 	isObstacle = 0;
@@ -57,8 +70,9 @@ int main(void){
 				//Do nothing until there is no obstacle
 				setSpeed(50);
 				moveForward(1);
-				moveBackward(1);
+				moveBackward(1);				
 			}
+			delay(10);//Wait for garage to open
 			setSpeed(1);
 			moveForward(360); //Requirement: 4
 			enterFlag = 0; //Handle flag, prevent infinite loop
